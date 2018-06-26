@@ -1,26 +1,48 @@
 package pieces;
 
-public class Knight extends Piece {	
+import game.GameBoard;
+import game.Tile;
+
+public class Knight extends Piece {
 	public Knight (String color) {
 		this.setImage(color + " knight.png");
 		this.setColor(color);
+
+		mods = new int[][] {
+			{-2, -1},
+			{-1, -2},
+			{-2,  1},
+			{-1,  2},
+			{ 2, -1},
+			{ 1, -2},
+			{ 2,  1},
+			{ 1,  2}
+		};
 	}
 
-	public boolean moveIsValid(int[] end) {
-		boolean isValid = false;
-		int[] start = getCurrentPos();
-		
-		int colChange = end[0] - start[0];
-		int rowChange = end[1] - start[1];
-		
-		if ((colChange == 1 || colChange == -1) && (rowChange == 2 || rowChange == -2)) {
-			isValid = true;
-		}
-		
-		else if ((colChange == 2 || colChange == -2) && (rowChange == 1 || rowChange == -1)) {
-			isValid = true;
-		}
+	@Override
+	public void calcMoves() {
+//		Util.debug("Calculating moves...");
+		moves.clear();
+		for (int[] mod : mods) {
+//			Util.debug("Checking mod " + mod[0] + ", " + mod[1] + "...");
+			Tile t = getCurrentPos().copy();
+			t.increment(mod[0], mod[1]);
 
-		return isValid;
+			if (t.isValid()) {
+//				Util.debug("Checking generated point " + p + "...");
+				Piece piece = t.getPiece();
+				if (piece != null && !piece.getColor().equals(color)) {
+//					Util.debug("Adding point " + p + " to moves list...");
+					moves.add(t.copy());
+					t.increment(mod[0], mod[1]);
+				}
+				else if (piece == null) {
+//					Util.debug("Adding point " + p + " to moves list...");
+					moves.add(t.copy());
+					t.increment(mod[0], mod[1]);
+				}
+			}
+		}
 	}
 }
