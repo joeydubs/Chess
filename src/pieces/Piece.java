@@ -7,15 +7,13 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import game.GameBoard;
 import game.Tile;
 import game.Util;
 
 public class Piece {
 	private Image image;
-	protected String color;
+	private String color;
 	private Tile currentPos;
-	protected Tile possibleMoves;
 	protected boolean hasMoved = false;
 	protected int[][] mods;
 	protected ArrayList<Tile> moves = new ArrayList<Tile>();
@@ -105,11 +103,7 @@ public class Piece {
 	public Tile getCurrentPos() {
 		return currentPos;
 	}
-	
-	protected int getDist(int x, int y) {
-		return (x - y);
-	}
-		
+			
 	public boolean hasMoved() {
 		return hasMoved;
 	}

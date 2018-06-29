@@ -32,7 +32,7 @@ public class Knight extends Piece {
 			if (t.isValid()) {
 //				Util.debug("Checking generated point " + p + "...");
 				Piece piece = t.getPiece();
-				if (piece != null && !piece.getColor().equals(color)) {
+				if (piece != null && !piece.getColor().equals(getColor())) {
 //					Util.debug("Adding point " + p + " to moves list...");
 					moves.add(t.copy());
 					t.increment(mod[0], mod[1]);
