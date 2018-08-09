@@ -38,7 +38,7 @@ public class GameBoard extends JPanel {
 		this.tileSize = tileSize;
 		this.setSize(new Dimension(tileSize * 8, tileSize * 8));
 		this.addMouseListener(new ClickListener());
-		
+
 		for (int row = 0; row < 8; row++) {
 			for (int col = 0; col < 8; col++) {
 				board[col][row] = new Tile(col, row);
@@ -59,8 +59,7 @@ public class GameBoard extends JPanel {
 				if ((row + col) % 2 == 0) {
 					g.setColor(Color.LIGHT_GRAY);
 					g.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
-				}
-				else {
+				} else {
 					g.setColor(Color.GRAY);
 					g.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
 				}
@@ -75,10 +74,10 @@ public class GameBoard extends JPanel {
 
 		for (int row = 0; row < 8; row++) {
 			for (int col = 0; col < 8; col++) {
-				//				Util.debug("Tile is not null: " + (tile[col][row] != null));
+				// Util.debug("Tile is not null: " + (tile[col][row] != null));
 				if (board[col][row].getPiece() != null) {
-					//					Util.debug("Drawing piece at " + col + ", " + row);
-					//					Util.debug("Image is not null: " + (tile[col][row].getImage() != null));
+					// Util.debug("Drawing piece at " + col + ", " + row);
+					// Util.debug("Image is not null: " + (tile[col][row].getImage() != null));
 					Image img = board[col][row].getPiece().getImage();
 					g.drawImage(img, (col * tileSize), (row * tileSize), this);
 				}
@@ -86,7 +85,7 @@ public class GameBoard extends JPanel {
 		}
 	}
 
-	void setup () {
+	void setup() {
 		Util.debug("Setting up pieces...");
 		Piece[] blackPlayer = new Piece[16];
 		Piece[] whitePlayer = new Piece[16];
@@ -132,26 +131,26 @@ public class GameBoard extends JPanel {
 
 		for (int row = 0; row < 2; row++) {
 			for (int col = 0; col < 8; col++) {
-				Tile tile = board[col][7-row];
+				Tile tile = board[col][7 - row];
 				Piece piece = whitePlayer[col + (8 * row)];
 				placePiece(piece, tile);
 				whitePieces.add(piece);
 			}
 		}
 	}
-	
+
 	public static void placePiece(Piece piece, Tile tile) {
 		tile.placePiece(piece);
 		piece.setCurrentPos(tile);
 	}
 
-	public static void movePiece(Tile start, Tile end) {		
+	public static void movePiece(Tile start, Tile end) {
 		Piece piece = start.getPiece();
 
 		if (piece != null) {
 			placePiece(piece, end);
 			start.removePiece();
-		}		
+		}
 	}
 
 //	// Remove a piece from a position
@@ -162,8 +161,7 @@ public class GameBoard extends JPanel {
 	public static void addPiece(Piece endPiece) {
 		if (endPiece.getColor().equals("white")) {
 			whitePieces.add(endPiece);
-		}
-		else {
+		} else {
 			blackPieces.add(endPiece);
 		}
 	}
@@ -173,8 +171,7 @@ public class GameBoard extends JPanel {
 		if (piece != null) {
 			if (piece.getColor().equalsIgnoreCase("white")) {
 				whitePieces.remove(piece);
-			}
-			else {
+			} else {
 				blackPieces.remove(piece);
 			}
 		}
@@ -183,8 +180,7 @@ public class GameBoard extends JPanel {
 	public static LinkedList<Piece> getPieceSet(String color) {
 		if (color.equalsIgnoreCase("white")) {
 			return whitePieces;
-		}
-		else {
+		} else {
 			return blackPieces;
 		}
 	}
@@ -198,15 +194,13 @@ public class GameBoard extends JPanel {
 
 		return isEmpty;
 	}
-	
+
 	public static Map<Tile, ArrayList<Piece>> getThreatsTo(String color) {
 		if (color.equals("white")) {
 			return threatsToWhite;
-		}
-		else if (color.equals("black")) {
+		} else if (color.equals("black")) {
 			return threatsToBlack;
-		}
-		else {
+		} else {
 			Util.debug("Invalid color passed - GameBoard.class.getThreat");
 			return null;
 		}
@@ -215,11 +209,9 @@ public class GameBoard extends JPanel {
 	public static Piece getKing(String color) {
 		if (color.equalsIgnoreCase("white")) {
 			return whiteKing;
-		}
-		else if (color.equalsIgnoreCase("black")) {
+		} else if (color.equalsIgnoreCase("black")) {
 			return blackKing;
-		}
-		else {
+		} else {
 			Util.debug("Invalid color " + color + " passed to getKingPosition");
 			return null;
 		}
@@ -252,15 +244,14 @@ public class GameBoard extends JPanel {
 				if (threatsToBlack.containsKey(move)) {
 					ArrayList<Piece> pieces = threatsToBlack.get(move);
 					pieces.add(piece);
-				}
-				else {
+				} else {
 					ArrayList<Piece> pieces = new ArrayList<Piece>();
 					pieces.add(piece);
 					threatsToBlack.put(move, pieces);
 				}
 			}
 		}
-		
+
 		for (Piece piece : blackPieces) {
 			piece.calcMoves();
 			ArrayList<Tile> moves = piece.getMoves();
@@ -268,15 +259,14 @@ public class GameBoard extends JPanel {
 				if (threatsToWhite.containsKey(move)) {
 					ArrayList<Piece> pieces = threatsToWhite.get(move);
 					pieces.add(piece);
-				}
-				else {
+				} else {
 					ArrayList<Piece> pieces = new ArrayList<Piece>();
 					pieces.add(piece);
 					threatsToWhite.put(move, pieces);
 				}
 			}
 		}
-		
+
 		System.out.println(threatsToWhite);
 		System.out.println(threatsToBlack);
 	}
@@ -287,6 +277,7 @@ public class GameBoard extends JPanel {
 	}
 
 	private class ClickListener extends MouseAdapter {
+		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				int x = e.getPoint().x / tileSize;
@@ -297,38 +288,31 @@ public class GameBoard extends JPanel {
 
 				if (x >= 8 || y >= 8) {
 					Util.debug("Out of bounds");
-				}
-				else if (selectedTile == null) {
+				} else if (selectedTile == null) {
 					Util.debug("Tile selected");
 
 					Piece piece = t.getPiece();
 					if (piece == null) {
 						System.out.println("Empty tile");
-					}
-					else if (piece.getColor().equalsIgnoreCase(GameEngine.getTurn())) {
+					} else if (piece.getColor().equalsIgnoreCase(GameEngine.getTurn())) {
 						System.out.println("Piece selected");
 						selectedTile = t;
-					}
-					else if (!piece.getColor().equalsIgnoreCase(GameEngine.getTurn())) {
+					} else if (!piece.getColor().equalsIgnoreCase(GameEngine.getTurn())) {
 						System.out.println("This is not one of your pieces: " + GameEngine.getTurn() + " to move.");
 					}
-				}
-				else if (t.equals(selectedTile)) {
+				} else if (t.equals(selectedTile)) {
 					Util.debug("Tile deselected");
 					selectedTile = null;
-				}
-				else {
+				} else {
 					GameEngine.attemptMove(selectedTile.getPiece(), t);
 					if ((bCheck || wCheck)) {
 						Util.debug("White king is in check: " + wCheck + ", Black king is in check: " + bCheck);
 						if (GameEngine.isCheckmate()) {
 							if (wCheck) {
 								Util.debug("White king has been checkmated.");
-							}
-							else if (bCheck) {
+							} else if (bCheck) {
 								Util.debug("Black king has been checkmated.");
-							}
-							else {
+							} else {
 								Util.debug("Not actually checkmate - GameBoard.Class.ClickListener");
 							}
 						}

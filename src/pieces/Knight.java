@@ -1,23 +1,13 @@
 package pieces;
 
-import game.GameBoard;
 import game.Tile;
 
 public class Knight extends Piece {
-	public Knight (String color) {
+	public Knight(String color) {
 		this.setImage(color + " knight.png");
 		this.setColor(color);
 
-		mods = new int[][] {
-			{-2, -1},
-			{-1, -2},
-			{-2,  1},
-			{-1,  2},
-			{ 2, -1},
-			{ 1, -2},
-			{ 2,  1},
-			{ 1,  2}
-		};
+		mods = new int[][] { { -2, -1 }, { -1, -2 }, { -2, 1 }, { -1, 2 }, { 2, -1 }, { 1, -2 }, { 2, 1 }, { 1, 2 } };
 	}
 
 	@Override
@@ -32,12 +22,11 @@ public class Knight extends Piece {
 			if (t.isValid()) {
 //				Util.debug("Checking generated point " + p + "...");
 				Piece piece = t.getPiece();
-				if (piece != null && !piece.getColor().equals(color)) {
+				if (piece != null && !piece.getColor().equals(getColor())) {
 //					Util.debug("Adding point " + p + " to moves list...");
 					moves.add(t.copy());
 					t.increment(mod[0], mod[1]);
-				}
-				else if (piece == null) {
+				} else if (piece == null) {
 //					Util.debug("Adding point " + p + " to moves list...");
 					moves.add(t.copy());
 					t.increment(mod[0], mod[1]);

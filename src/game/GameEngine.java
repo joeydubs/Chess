@@ -73,7 +73,7 @@ public class GameEngine {
 		if (endPiece != null) {
 			GameBoard.placePiece(endPiece, end);
 			GameBoard.addPiece(endPiece);
-		}		
+		}
 	}
 
 	private static void checkStatus() {
@@ -100,25 +100,25 @@ public class GameEngine {
 		}
 	}
 
-	//	private static boolean checkStatus(Point position, String color) {
-	//		boolean isCheck = false;
-	//		LinkedList<Piece> pieces;
+	// private static boolean checkStatus(Point position, String color) {
+	// boolean isCheck = false;
+	// LinkedList<Piece> pieces;
 	//
-	//		if (color.equalsIgnoreCase("white")) {
-	//			pieces = GameBoard.getPieceSet("black");
-	//		}
-	//		else {
-	//			pieces = GameBoard.getPieceSet("white");
-	//		}
+	// if (color.equalsIgnoreCase("white")) {
+	// pieces = GameBoard.getPieceSet("black");
+	// }
+	// else {
+	// pieces = GameBoard.getPieceSet("white");
+	// }
 	//
-	//		for (Piece piece : pieces) {
-	//			if (piece.moveIsValid(position)) {
-	//				isCheck = true;
-	//			}
-	//		}
+	// for (Piece piece : pieces) {
+	// if (piece.moveIsValid(position)) {
+	// isCheck = true;
+	// }
+	// }
 	//
-	//		return isCheck;
-	//	}
+	// return isCheck;
+	// }
 
 	public static boolean isCheckmate() {
 		boolean isCheckmate = true;
@@ -129,8 +129,7 @@ public class GameEngine {
 		if (GameBoard.wCheck()) {
 			king = GameBoard.getKing("white");
 			pCC = blackPCC;
-		}
-		else {
+		} else {
 			king = GameBoard.getKing("black");
 			pCC = whitePCC;
 		}
@@ -141,7 +140,7 @@ public class GameEngine {
 			isCheckmate = !canBlockRoute(king, pCC.get(0));
 		}
 
-		return isCheckmate;			
+		return isCheckmate;
 	}
 
 	private static boolean kingCanEscape(Piece king, ArrayList<Piece> pCC) {
@@ -154,8 +153,7 @@ public class GameEngine {
 			Util.debug("Checking king's ability to move to " + p + "...");
 			if (GameBoard.getThreatsTo(king.getColor()).containsKey(p)) {
 				Util.debug("Position " + p + " is under threat, unable to move there...");
-			}
-			else {
+			} else {
 				Piece endPiece = p.getPiece();
 				GameBoard.movePiece(king.getCurrentPos(), p);
 				GameBoard.removePiece(endPiece);
@@ -173,24 +171,24 @@ public class GameEngine {
 
 		return canEscape;
 	}
-	
+
 	private static boolean canBlockRoute(Piece king, Piece piece) {
 		boolean canBlock = false;
-		
+
 		ArrayList<Tile> path = piece.getMovesCopy();
 		Map<Tile, ArrayList<Piece>> kingsGuardians = GameBoard.getThreatsTo(piece.getColor());
-		
+
 		for (Tile p : path) {
 			if (kingsGuardians.containsKey(p)) {
 				ArrayList<Piece> pieces = kingsGuardians.get(p);
-		for (Piece guardian : pieces) {
+				for (Piece guardian : pieces) {
 					Tile guardianStart = guardian.getCurrentPos();
 					Piece endPiece = p.getPiece();
 					GameBoard.movePiece(guardian.getCurrentPos(), p);
 					GameBoard.mapMoves();
 
 					if (!GameBoard.getThreatsTo(king.getColor()).containsKey(king.getCurrentPos())) {
-						Util.debug("Piece " + guardian + " can block check at position "+ p + "...");
+						Util.debug("Piece " + guardian + " can block check at position " + p + "...");
 
 						canBlock = true;
 					}
@@ -199,20 +197,20 @@ public class GameEngine {
 				}
 			}
 		}
-		
+
 		if (!canBlock) {
 			Tile attackerPos = piece.getCurrentPos();
 			if (kingsGuardians.containsKey(attackerPos)) {
 				ArrayList<Piece> pieces = kingsGuardians.get(attackerPos);
 				for (Piece guardian : pieces) {
 					Tile guardianStart = guardian.getCurrentPos();
-					
+
 					GameBoard.movePiece(guardian.getCurrentPos(), attackerPos);
 					GameBoard.removePiece(piece);
 					GameBoard.mapMoves();
 
 					if (!GameBoard.getThreatsTo(king.getColor()).containsKey(king.getCurrentPos())) {
-						Util.debug("Piece " + guardian + " can block check at position "+ attackerPos + "...");
+						Util.debug("Piece " + guardian + " can block check at position " + attackerPos + "...");
 
 						canBlock = true;
 					}
@@ -221,7 +219,7 @@ public class GameEngine {
 				}
 			}
 		}
-		
+
 		return canBlock;
 	}
 }
