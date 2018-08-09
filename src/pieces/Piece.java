@@ -21,24 +21,23 @@ public class Piece {
 	public Image getImage() {
 		return image;
 	}
-	
+
 	protected void setImage(String img) {
 		BufferedImage image = null;
-		
+
 		try {
 			image = ImageIO.read(getClass().getResourceAsStream("/images/" + img));
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			Util.debug("Unable to load image for file name " + img);
 		}
 		this.image = image;
-		
+
 	}
-	
+
 	protected void setColor(String color) {
 		this.color = color;
 	}
-	
+
 	public String getColor() {
 		return color;
 	}
@@ -47,8 +46,7 @@ public class Piece {
 		if (moves.contains(end)) {
 			Util.debug("Move is valid");
 			return true;
-		}
-		else {
+		} else {
 			Util.debug("Moves does not contain point " + end);
 			return false;
 		}
@@ -63,7 +61,7 @@ public class Piece {
 			t.increment(mod[0], mod[1]);
 
 			boolean occupied = false;
-			
+
 			while (!occupied && t.isValid()) {
 //				Util.debug("Checking generated point " + p + "...");
 				Piece piece = t.getPiece();
@@ -73,8 +71,7 @@ public class Piece {
 //						Util.debug("Adding point " + p + " to moves list...");
 						moves.add(t.copy());
 					}
-				}
-				else {
+				} else {
 //					Util.debug("Adding point " + p + " to moves list...");
 					moves.add(t.copy());
 					t.increment(mod[0], mod[1]);
@@ -82,11 +79,11 @@ public class Piece {
 			}
 		}
 	}
-	
+
 	public ArrayList<Tile> getMoves() {
 		return moves;
 	}
-	
+
 	public ArrayList<Tile> getMovesCopy() {
 		ArrayList<Tile> copy = new ArrayList<Tile>();
 		for (Tile p : moves) {
@@ -95,23 +92,22 @@ public class Piece {
 		return copy;
 	}
 
-	
 	public void setCurrentPos(Tile position) {
 		currentPos = position;
 	}
-	
+
 	public Tile getCurrentPos() {
 		return currentPos;
 	}
-			
+
 	public boolean hasMoved() {
 		return hasMoved;
 	}
-	
+
 	public void moved() {
 		hasMoved = true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return color + " " + this.getClass().getSimpleName();

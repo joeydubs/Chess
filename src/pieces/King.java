@@ -1,25 +1,15 @@
 package pieces;
 
-import game.GameBoard;
 import game.Tile;
 
 public class King extends Piece {
 	boolean canCastle = true;
 
-	public King (String color) {
+	public King(String color) {
 		this.setImage(color + " king.png");
 		this.setColor(color);
 
-		mods = new int[][] {
-			{-1, -1},
-			{-1,  0},
-			{-1,  1},
-			{ 0, -1},
-			{ 0,  1},
-			{ 1, -1},
-			{ 1,  0},
-			{ 1,  1}
-		};
+		mods = new int[][] { { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, -1 }, { 0, 1 }, { 1, -1 }, { 1, 0 }, { 1, 1 } };
 	}
 
 	@Override
@@ -38,8 +28,7 @@ public class King extends Piece {
 //					Util.debug("Adding point " + p + " to moves list...");
 					moves.add(t.copy());
 					t.increment(mod[0], mod[1]);
-				}
-				else if (piece == null) {
+				} else if (piece == null) {
 //					Util.debug("Adding point " + p + " to moves list...");
 					moves.add(t.copy());
 					t.increment(mod[0], mod[1]);

@@ -1,29 +1,18 @@
 package pieces;
 
-import game.GameBoard;
 import game.Tile;
 import game.Util;
 
 public class Pawn extends Piece {
-	public Pawn (String color) {
+	public Pawn(String color) {
 		this.setImage(color + " pawn.png");
 		this.setColor(color);
 
 		if (color.equals("white")) {
-			mods = new int[][] {
-				{ 0, -1},
-				{-1, -1},
-				{ 1, -1}
-			};
-		}
-		else if (color.equals("black")) {
-			mods = new int[][] {
-				{ 0,  1},
-				{-1,  1},
-				{ 1,  1}
-			};
-		}
-		else {
+			mods = new int[][] { { 0, -1 }, { -1, -1 }, { 1, -1 } };
+		} else if (color.equals("black")) {
+			mods = new int[][] { { 0, 1 }, { -1, 1 }, { 1, 1 } };
+		} else {
 			Util.debug("Invalid color passed to Pawn constructor...");
 		}
 	}
@@ -52,8 +41,7 @@ public class Pawn extends Piece {
 							}
 						}
 					}
-				}
-				else {
+				} else {
 //					Util.debug("Pawn is moving diagonal...");
 					Piece piece = t.getPiece();
 					if (piece != null && !piece.getColor().equals(getColor())) {
