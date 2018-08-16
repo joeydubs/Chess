@@ -24,15 +24,13 @@ import pieces.Rook;
 public class GameBoard extends JPanel {
 	int tileSize;
 	private static Tile[][] board = new Tile[8][8];
+	private static String turn = "white";
 	private static Tile selectedTile = null;
-	private static Piece whiteKing;
-	private static Piece blackKing;
-	private static boolean wCheck = false;
-	private static boolean bCheck = false;
+	private static boolean whiteInCheck = false;
+	private static boolean blackInCheck = false;
 	private static LinkedList<Piece> whitePieces = new LinkedList<Piece>();
 	private static LinkedList<Piece> blackPieces = new LinkedList<Piece>();
-	private static Map<Tile, ArrayList<Piece>> threatsToWhite = new HashMap<Tile, ArrayList<Piece>>();
-	private static Map<Tile, ArrayList<Piece>> threatsToBlack = new HashMap<Tile, ArrayList<Piece>>();
+	private static Map<Tile, ArrayList<Piece>> moves = new HashMap<Tile, ArrayList<Piece>>();
 
 	public GameBoard(int tileSize) {
 		this.tileSize = tileSize;
@@ -85,10 +83,11 @@ public class GameBoard extends JPanel {
 		}
 	}
 
-	void setup() {
+	private void setup() {
 		Util.debug("Setting up pieces...");
 		Piece[] blackPlayer = new Piece[16];
 		Piece[] whitePlayer = new Piece[16];
+		int toPlace = 0;
 
 		whitePlayer[0] = new Rook("white");
 		whitePlayer[1] = new Knight("white");
@@ -103,8 +102,6 @@ public class GameBoard extends JPanel {
 			whitePlayer[8 + i] = new Pawn("white");
 		}
 
-		whiteKing = whitePlayer[4];
-
 		blackPlayer[0] = new Rook("black");
 		blackPlayer[1] = new Knight("black");
 		blackPlayer[2] = new Bishop("black");
@@ -117,158 +114,129 @@ public class GameBoard extends JPanel {
 		for (int i = 0; i < 8; i++) {
 			blackPlayer[8 + i] = new Pawn("black");
 		}
-
-		blackKing = blackPlayer[4];
-
+		
 		for (int row = 0; row < 2; row++) {
 			for (int col = 0; col < 8; col++) {
 				Tile tile = board[col][row];
-				Piece piece = blackPlayer[col + (8 * row)];
+				Piece piece = blackPlayer[toPlace];
 				placePiece(piece, tile);
 				blackPieces.add(piece);
+				toPlace++;
 			}
 		}
-
+		
+		toPlace = 0;
 		for (int row = 0; row < 2; row++) {
 			for (int col = 0; col < 8; col++) {
 				Tile tile = board[col][7 - row];
-				Piece piece = whitePlayer[col + (8 * row)];
+				Piece piece = whitePlayer[toPlace];
 				placePiece(piece, tile);
 				whitePieces.add(piece);
+				toPlace++;
 			}
 		}
 	}
+	
+	// Return value indicates if the piece can move there [0], and if it can keep moving [1]
+	public static boolean[] canMoveHere(Piece p, Tile t) {
+		boolean[] answer = new boolean[2];
+		
+		if (t.isOccupied()) {
+			answer[0] = true;
+			answer[1] = true;
+		}
+		else {
+			answer[1] = false;
+			
+			Piece occupying = t.getPiece();
+			if (!occupying.getColor().equalsIgnoreCase(p.getColor())) {
+				answer[0] = true;
+			}
+			else {
+				answer[0] = false;
+			}
+		}
+		
+		return answer;
+	}
 
-	public static void placePiece(Piece piece, Tile tile) {
+	private static void placePiece(Piece piece, Tile tile) {
 		tile.placePiece(piece);
 		piece.setCurrentPos(tile);
 	}
-
-	public static void movePiece(Tile start, Tile end) {
-		Piece piece = start.getPiece();
-
-		if (piece != null) {
-			placePiece(piece, end);
-			start.removePiece();
+	
+	private static boolean isValidMove(Piece p, Tile t) {
+		if (moves.get(t).contains(p)) {
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 
-//	// Remove a piece from a position
-//	public static void removePiece(Tile t) {
-//		t.removePiece();
-//	}
+	private static boolean movePiece(Tile start, Tile end) {
+		Piece toMove = start.getPiece();
+		Piece enemy = end.getPiece();
 
-	public static void addPiece(Piece endPiece) {
-		if (endPiece.getColor().equals("white")) {
-			whitePieces.add(endPiece);
-		} else {
-			blackPieces.add(endPiece);
+		if (toMove != null) {
+			placePiece(toMove, end);
+			start.removePiece();
+			
+			if (enemy != null) {
+				removePiece(enemy);
+			}
+			
+			if (turn.equalsIgnoreCase("white")) {
+				turn = "black";
+			}
+			else {
+				turn = "white";
+			}
+			
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 
 	// If a piece is captured it needs to be removed from the list of pieces
-	public static void removePiece(Piece piece) {
-		if (piece != null) {
-			if (piece.getColor().equalsIgnoreCase("white")) {
-				whitePieces.remove(piece);
-			} else {
-				blackPieces.remove(piece);
-			}
-		}
-	}
-
-	public static LinkedList<Piece> getPieceSet(String color) {
-		if (color.equalsIgnoreCase("white")) {
-			return whitePieces;
+	private static void removePiece(Piece piece) {
+		if (piece.getColor().equalsIgnoreCase("white")) {
+			whitePieces.remove(piece);
 		} else {
-			return blackPieces;
+			blackPieces.remove(piece);
 		}
 	}
-
-	public static boolean isEmpty(Tile p) {
-		boolean isEmpty = false;
-
-		if (board[p.x()][p.y()] == null) {
-			isEmpty = true;
-		}
-
-		return isEmpty;
-	}
-
-	public static Map<Tile, ArrayList<Piece>> getThreatsTo(String color) {
-		if (color.equals("white")) {
-			return threatsToWhite;
-		} else if (color.equals("black")) {
-			return threatsToBlack;
-		} else {
-			Util.debug("Invalid color passed - GameBoard.class.getThreat");
-			return null;
-		}
-	}
-
-	public static Piece getKing(String color) {
-		if (color.equalsIgnoreCase("white")) {
-			return whiteKing;
-		} else if (color.equalsIgnoreCase("black")) {
-			return blackKing;
-		} else {
-			Util.debug("Invalid color " + color + " passed to getKingPosition");
-			return null;
-		}
-	}
-
-	public static boolean wCheck() {
-		return wCheck;
-	}
-
-	public static void wCheck(boolean b) {
-		wCheck = b;
-	}
-
-	public static boolean bCheck() {
-		return bCheck;
-	}
-
-	public static void bCheck(boolean b) {
-		bCheck = b;
-	}
-
+				
 	public static void mapMoves() {
 		Util.debug("Mapping moves...");
-		threatsToWhite.clear();
-		threatsToBlack.clear();
+		moves.clear();
 		for (Piece piece : whitePieces) {
 			piece.calcMoves();
-			ArrayList<Tile> moves = piece.getMoves();
-			for (Tile move : moves) {
-				if (threatsToBlack.containsKey(move)) {
-					ArrayList<Piece> pieces = threatsToBlack.get(move);
-					pieces.add(piece);
-				} else {
-					ArrayList<Piece> pieces = new ArrayList<Piece>();
-					pieces.add(piece);
-					threatsToBlack.put(move, pieces);
+			ArrayList<Tile> pieceMoves = piece.getMoves();
+			for (Tile t : pieceMoves) {
+				if(moves.containsKey(t)) {
+					moves.get(t).add(piece);
+				}
+				else {
+					moves.put(t, new ArrayList<Piece>(){{add(piece);}});
 				}
 			}
 		}
 
 		for (Piece piece : blackPieces) {
 			piece.calcMoves();
-			ArrayList<Tile> moves = piece.getMoves();
-			for (Tile move : moves) {
-				if (threatsToWhite.containsKey(move)) {
-					ArrayList<Piece> pieces = threatsToWhite.get(move);
-					pieces.add(piece);
-				} else {
-					ArrayList<Piece> pieces = new ArrayList<Piece>();
-					pieces.add(piece);
-					threatsToWhite.put(move, pieces);
+			ArrayList<Tile> pieceMoves = piece.getMoves();
+			for (Tile t : pieceMoves) {
+				if(moves.containsKey(t)) {
+					moves.get(t).add(piece);
+				}
+				else {
+					moves.put(t, new ArrayList<Piece>(){{add(piece);}});
 				}
 			}
 		}
-
-		System.out.println(threatsToWhite);
-		System.out.println(threatsToBlack);
 	}
 
 	@Override
@@ -284,39 +252,45 @@ public class GameBoard extends JPanel {
 				int y = e.getPoint().y / tileSize;
 
 				Tile t = board[x][y];
-				Util.debug("Click point: " + t.x() + ", " + t.y());
+				Piece piece = t.getPiece();
+
+				Util.debug("Click point: " + t.toString());
 
 				if (x >= 8 || y >= 8) {
 					Util.debug("Out of bounds");
-				} else if (selectedTile == null) {
+				}
+				else if (selectedTile == null) {
 					Util.debug("Tile selected");
-
-					Piece piece = t.getPiece();
+					
 					if (piece == null) {
 						System.out.println("Empty tile");
-					} else if (piece.getColor().equalsIgnoreCase(GameEngine.getTurn())) {
+					}
+					else if (piece.getColor().equalsIgnoreCase(turn)) {
 						System.out.println("Piece selected");
 						selectedTile = t;
-					} else if (!piece.getColor().equalsIgnoreCase(GameEngine.getTurn())) {
-						System.out.println("This is not one of your pieces: " + GameEngine.getTurn() + " to move.");
 					}
-				} else if (t.equals(selectedTile)) {
+					else if (!piece.getColor().equalsIgnoreCase(turn)) {
+						System.out.println("This is not one of your pieces: " + turn + " to move.");
+					}
+				}
+				else if (t.equals(selectedTile)) {
 					Util.debug("Tile deselected");
 					selectedTile = null;
-				} else {
-					GameEngine.attemptMove(selectedTile.getPiece(), t);
-					if ((bCheck || wCheck)) {
-						Util.debug("White king is in check: " + wCheck + ", Black king is in check: " + bCheck);
-						if (GameEngine.isCheckmate()) {
-							if (wCheck) {
-								Util.debug("White king has been checkmated.");
-							} else if (bCheck) {
-								Util.debug("Black king has been checkmated.");
-							} else {
-								Util.debug("Not actually checkmate - GameBoard.Class.ClickListener");
-							}
-						}
-					}
+				}
+				else {
+					isValidMove(piece, t);
+					movePiece(selectedTile, t);
+//					if ((blackInCheck || whiteInCheck)) {
+//						Util.debug("White king is in check: " + whiteInCheck + ", Black king is in check: " + blackInCheck);
+//						if (GameEngine.isCheckmate()) {
+//							if (whiteInCheck) {
+//								Util.debug("White king has been checkmated.");
+//							} else if (blackInCheck) {
+//								Util.debug("Black king has been checkmated.");
+//							} else {
+//								Util.debug("Not actually checkmate - GameBoard.Class.ClickListener");
+//							}
+//						}
 					update(getGraphics());
 					selectedTile = null;
 					mapMoves();

@@ -1,58 +1,45 @@
 package game;
 
-import java.util.ArrayList;
-
 import pieces.Piece;
 
 public class Tile {
 	private int x;
 	private int y;
 
-	private boolean black;
-	private ArrayList<Piece> blackThreats = new ArrayList<Piece>();
-	private boolean white;
-	private ArrayList<Piece> whiteThreats = new ArrayList<Piece>();
-
+	private boolean isOccupied;
 	private Piece piece;
-
-	public void placePiece(Piece p) {
-		piece = p;
-	}
-
-	public Piece getPiece() {
-		return piece;
-	}
-
-	public Piece removePiece() {
-		Piece p = piece;
-		piece = null;
-
-		return p;
-	}
-
-	public boolean isThreatenedBy(String color) {
-		if (color.equals("white")) {
-			return white;
-		} else {
-			return black;
-		}
-	}
-
-	public void addThreatBy(Piece p) {
-		if (p.getColor().equals("white")) {
-			white = true;
-			whiteThreats.add(p);
-		} else {
-			black = true;
-			blackThreats.add(p);
-		}
-	}
-
+	
 	public Tile(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
 
+	public void placePiece(Piece p) {
+		piece = p;
+	}
+
+	public boolean isOccupied() {
+		return isOccupied;
+	}
+	
+	public String getColor() {
+		if (piece.getColor().equalsIgnoreCase("white")) {
+			return "white";
+		}
+		else {
+			return "black";
+		}
+	}
+	
+	public Piece getPiece() {
+		return piece;
+	}
+
+	public void removePiece() {
+		piece = null;
+	}
+	
+/*
 	@Override
 	public boolean equals(Object p) {
 		Tile point = p.getClass().equals(Tile.class) ? (Tile) p : null;
@@ -61,7 +48,7 @@ public class Tile {
 			return false;
 		}
 
-		if (point.x() == x && point.y() == y) {
+		if (point.x == x && point.y == y) {
 			return true;
 		} else {
 			return false;
@@ -77,33 +64,7 @@ public class Tile {
 		return result;
 
 	}
-
-	public int x() {
-		return x;
-	}
-
-	public int y() {
-		return y;
-	}
-
-	public void increment(int colMod, int rowMod) {
-		x += colMod;
-		y += rowMod;
-
-		// GameBoard.getTile
-	}
-
-	public boolean isValid() {
-		if (x < 0 || x > 7 || y < 0 || y > 7) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	public Tile copy() {
-		return new Tile(x, y);
-	}
+*/
 
 	@Override
 	public String toString() {
