@@ -1,15 +1,14 @@
 package pieces;
 
-import game.Tile;
-
 public class Knight extends Piece {
 	public Knight(String color) {
 		this.setImage(color + " knight.png");
 		this.setColor(color);
+		this.continuous = false;
 
 		mods = new int[][] { { -2, -1 }, { -1, -2 }, { -2, 1 }, { -1, 2 }, { 2, -1 }, { 1, -2 }, { 2, 1 }, { 1, 2 } };
 	}
-
+/*
 	@Override
 	public void calcMoves() {
 //		Util.debug("Calculating moves...");
@@ -34,4 +33,5 @@ public class Knight extends Piece {
 			}
 		}
 	}
+*/
 }

@@ -1,17 +1,16 @@
 package pieces;
 
-import game.Tile;
-
 public class King extends Piece {
 	boolean canCastle = true;
 
 	public King(String color) {
 		this.setImage(color + " king.png");
 		this.setColor(color);
+		this.continuous = false;
 
 		mods = new int[][] { { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, -1 }, { 0, 1 }, { 1, -1 }, { 1, 0 }, { 1, 1 } };
 	}
-
+/*
 	@Override
 	public void calcMoves() {
 //		Util.debug("Calculating moves...");
@@ -36,4 +35,5 @@ public class King extends Piece {
 			}
 		}
 	}
+*/
 }

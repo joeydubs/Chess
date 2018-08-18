@@ -138,22 +138,52 @@ public class GameBoard extends JPanel {
 	}
 	
 	// Return value indicates if the piece can move there [0], and if it can keep moving [1]
-	public static boolean[] canMoveHere(Piece p, Tile t) {
+	public static boolean[] canMoveHere(Piece p, int x, int y) {
 		boolean[] answer = new boolean[2];
 		
-		if (t.isOccupied()) {
+		if (x < 0 || x > 7 || y < 0 || y > 7) {
+			answer[0] = false;
+			answer[1] = false;
+			
+			return answer;
+		}
+		
+		Tile t = board[x][y];
+		
+		if (!t.isOccupied()) {
+//			System.out.println("Tile is not occupied...");
 			answer[0] = true;
 			answer[1] = true;
+			
+			if (moves.containsKey(t)) {
+				moves.get(t).add(p);
+			}
+			else {
+				moves.put(t, new ArrayList<Piece>(){{add(p);}});
+			}
+
 		}
 		else {
+//			System.out.println("Tile is occupied...");
 			answer[1] = false;
 			
 			Piece occupying = t.getPiece();
+			
 			if (!occupying.getColor().equalsIgnoreCase(p.getColor())) {
+//				System.out.println("Piece is a different color...");
 				answer[0] = true;
+				if (moves.containsKey(t)) {
+					moves.get(t).add(p);
+				}
+				else {
+					moves.put(t, new ArrayList<Piece>(){{add(p);}});
+				}
 			}
 			else {
+//				System.out.println("Piece is a the same color...");
 				answer[0] = false;
+//				System.out.println("Answer[0] = " + answer[0]);
+
 			}
 		}
 		
@@ -166,6 +196,7 @@ public class GameBoard extends JPanel {
 	}
 	
 	private static boolean isValidMove(Piece p, Tile t) {
+		ArrayList<Piece> tile = moves.get(t);
 		if (moves.get(t).contains(p)) {
 			return true;
 		}
@@ -181,6 +212,7 @@ public class GameBoard extends JPanel {
 		if (toMove != null) {
 			placePiece(toMove, end);
 			start.removePiece();
+			toMove.moved();
 			
 			if (enemy != null) {
 				removePiece(enemy);
@@ -214,29 +246,13 @@ public class GameBoard extends JPanel {
 		moves.clear();
 		for (Piece piece : whitePieces) {
 			piece.calcMoves();
-			ArrayList<Tile> pieceMoves = piece.getMoves();
-			for (Tile t : pieceMoves) {
-				if(moves.containsKey(t)) {
-					moves.get(t).add(piece);
-				}
-				else {
-					moves.put(t, new ArrayList<Piece>(){{add(piece);}});
-				}
-			}
 		}
 
 		for (Piece piece : blackPieces) {
 			piece.calcMoves();
-			ArrayList<Tile> pieceMoves = piece.getMoves();
-			for (Tile t : pieceMoves) {
-				if(moves.containsKey(t)) {
-					moves.get(t).add(piece);
-				}
-				else {
-					moves.put(t, new ArrayList<Piece>(){{add(piece);}});
-				}
-			}
 		}
+		
+		System.out.println(moves);
 	}
 
 	@Override
@@ -278,8 +294,12 @@ public class GameBoard extends JPanel {
 					selectedTile = null;
 				}
 				else {
-					isValidMove(piece, t);
-					movePiece(selectedTile, t);
+					if (isValidMove(selectedTile.getPiece(), t)) {
+						movePiece(selectedTile, t);
+					}
+					else {
+						Util.debug("Invallid move...");
+					}
 //					if ((blackInCheck || whiteInCheck)) {
 //						Util.debug("White king is in check: " + whiteInCheck + ", Black king is in check: " + blackInCheck);
 //						if (GameEngine.isCheckmate()) {

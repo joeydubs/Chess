@@ -16,10 +16,19 @@ public class Tile {
 
 	public void placePiece(Piece p) {
 		piece = p;
+		isOccupied = true;
 	}
 
 	public boolean isOccupied() {
 		return isOccupied;
+	}
+	
+	public int getX() {
+		return x;
+	}
+	
+	public int getY() {
+		return y;
 	}
 	
 	public String getColor() {
@@ -37,6 +46,7 @@ public class Tile {
 
 	public void removePiece() {
 		piece = null;
+		isOccupied = false;
 	}
 	
 /*

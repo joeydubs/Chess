@@ -7,14 +7,16 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import game.GameBoard;
 import game.Tile;
 import game.Util;
 
 public class Piece {
 	private Image image;
-	private String color;
-	private Tile currentPos;
+	protected String color;
+	protected Tile currentPos;
 	protected boolean hasMoved = false;
+	protected boolean continuous = false;
 	protected int[][] mods;
 	protected ArrayList<Tile> moves = new ArrayList<Tile>();
 
@@ -42,66 +44,37 @@ public class Piece {
 		return color;
 	}
 
-	public boolean moveIsValid(Tile end) {
-		if (moves.contains(end)) {
-			Util.debug("Move is valid");
-			return true;
-		} else {
-			Util.debug("Moves does not contain point " + end);
-			return false;
-		}
-	}
-
 	public void calcMoves() {
 //		Util.debug("Calculating moves...");
 		moves.clear();
+		
 		for (int[] mod : mods) {
 //			Util.debug("Checking mod " + mod[0] + ", " + mod[1] + "...");
-			Tile t = getCurrentPos().copy();
-			t.increment(mod[0], mod[1]);
-
-			boolean occupied = false;
-
-			while (!occupied && t.isValid()) {
-//				Util.debug("Checking generated point " + p + "...");
-				Piece piece = t.getPiece();
-				if (piece != null) {
-					occupied = true;
-					if (!piece.getColor().equals(color)) {
-//						Util.debug("Adding point " + p + " to moves list...");
-						moves.add(t.copy());
-					}
-				} else {
-//					Util.debug("Adding point " + p + " to moves list...");
-					moves.add(t.copy());
-					t.increment(mod[0], mod[1]);
+			
+			int currentX = currentPos.getX();
+			int currentY = currentPos.getY();
+			
+			boolean moving = true;
+			
+			do {
+				currentX += mod[0];
+				currentY += mod[1];
+				
+				// Response indicates if the piece can move here [0], and if it can keep moving [1]
+				boolean[] response = GameBoard.canMoveHere(this, currentX, currentY);
+								
+				if (response[0]) {
+					moves.add(new Tile(currentX, currentY));
 				}
-			}
+				
+				moving = response[1];
+//				System.out.println(this.toString() + " " + moving);
+			} while (moving && continuous);
 		}
-	}
-
-	public ArrayList<Tile> getMoves() {
-		return moves;
-	}
-
-	public ArrayList<Tile> getMovesCopy() {
-		ArrayList<Tile> copy = new ArrayList<Tile>();
-		for (Tile p : moves) {
-			copy.add(p);
-		}
-		return copy;
 	}
 
 	public void setCurrentPos(Tile position) {
 		currentPos = position;
-	}
-
-	public Tile getCurrentPos() {
-		return currentPos;
-	}
-
-	public boolean hasMoved() {
-		return hasMoved;
 	}
 
 	public void moved() {
