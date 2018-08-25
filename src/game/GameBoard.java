@@ -197,7 +197,7 @@ public class GameBoard extends JPanel {
 	
 	private static boolean isValidMove(Piece p, Tile t) {
 		ArrayList<Piece> tile = moves.get(t);
-		if (moves.get(t).contains(p)) {
+		if (moves.containsKey(t) && moves.get(t).contains(p)) {
 			return true;
 		}
 		else {
